@@ -1,0 +1,333 @@
+
+<script type="text/html" data-template-name="TigerGraphDatabase">
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="fa fa-globe"></i>TG Host</label>
+        <input type="text" id="node-config-input-host">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="fa fa-random"></i> TG Port</label>
+        <input type="text" id="node-config-input-port">
+    </div>
+        <div class="form-row">
+        <label for="node-config-input-user"><i class="fa fa-user"></i> User</label>
+        <input type="text" id="node-config-input-user">
+    </div>
+        <div class="form-row">
+        <label for="node-config-input-password"><i class="fa fa-lock"></i> Password</label>
+        <input type="password" id="node-config-input-password">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-graph"><i class="fa fa-database"></i> Graph</label>
+        <input type="text" id="node-config-input-graph">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-secret"><i class="fa fa-clock-o"></i> Secret</label>
+        <input type="text" id="node-config-input-secret">
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-cert"><i class="fa fa-tag"></i> ssl</label>
+        <input type="text" id="node-config-input-cert"> 
+        <input type="hidden" id="node-config-input-cert-type">
+        
+        <!-- <select id="node-input-cert">
+            <option value="true">True</option>
+            <option value="false">False</option>
+        </select> -->
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Name">
+        
+    </div>
+    
+</script>
+
+<script type="text/javascript">
+
+    RED.nodes.registerType('TigerGraphDatabase',{
+        category: 'config',
+        defaults: {
+            name: {value:""},
+            host: {value:"127.0.0.1",required:true},
+            port: {value:"9000",required:true},
+            cert: {value:""},
+            graph: {value:"MyGraph",required:true},
+            secret: {value:""},
+
+        },
+        credentials: {
+            user: {type: "text"},
+            password: {type: "password"}
+        },
+        label: function() {
+            return this.name || this.graph;
+        },
+        oneditprepare: function() {
+            $("#node-config-input-cert").typedInput({
+                type:"bool",
+                types:["bool"],
+                typeField: "#node-config-input-cert-type"
+            })
+        }
+    });
+</script>
+
+<script type="text/html" data-help-name="TigerGraphDatabase">
+    <p>Add the credentials for accessing your TG Instance here.</p>
+    
+    
+</script>
+
+
+<!--  Node Edge -->
+
+<script type="text/html" data-template-name="TigerGraphEdge">
+    <div class="form-row">
+        <label for="node-input-graph"><i class="fa fa-database"></i> TG Graph</label>
+        <input type="text" id="node-input-graph" placeholder="MyGraph">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <!-- Source Vertex -->
+    <div class="form-row">
+        <label for="nodeinput-secret"><i class="fa fa-clock-o"></i>Source Vertex</label>
+        <input type="text" id="node-input-vertexSource">
+    </div>
+    
+    <!-- Target Vertex -->
+    <div class="form-row">
+        <label for="nodeinput-secret"><i class="fa fa-clock-o"></i>Target Vertex</label>
+        <input type="text" id="node-input-vertexDestination">
+    </div>
+
+    <!-- Edge -->
+    <div class="form-row">
+        <label for="nodeinput-secret"><i class="fa fa-clock-o"></i>Edge</label>
+        <input type="text" id="node-input-edge">
+    </div>
+
+
+    <div class="form-row">
+        <label for="node-input-secret"><i class="fa fa-clock-o"></i> In</label>
+        <input type="text" id="node-input-inList">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-secret"><i class="fa fa-clock-o"></i> Out</label>
+        <input type="text" id="node-input-outList">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="TigerGraphEdge">
+    <p>Allows basic access to a TigerGraph database.</p>
+    
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('TigerGraphEdge',{
+        category: 'storage-input',
+        color:"#e97b00",
+        defaults: {
+            graph: {type:"TigerGraphDatabase",required:true},
+            name: {value:""},
+            vertexSource: {value:[],required:true},
+            vertexDestination: {value:[],required:true},
+            edge: {value:[],required:true},
+            inList: {value:[],required:true},
+            outList: {value:[],required:true},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "db.png",
+        label: function() {
+            var levelNode = RED.nodes.node(this.graph);
+            return this.name||(levelNode?levelNode.label():"TigerGraphEdge");
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>
+
+
+
+
+
+<!--  Node Vertex -->
+<script type="text/html" data-template-name="TigerGraphVertex">
+    <div class="form-row">
+        <label for="node-input-graph"><i class="fa fa-database"></i> TG Graph</label>
+        <input type="text" id="node-input-graph" placeholder="MyGraph">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    
+    <div class="form-row">
+        <label for="nodeinput-secret"><i class="fa fa-clock-o"></i> Vertex</label>
+        <input type="text" id="node-input-vertex">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-secret"><i class="fa fa-clock-o"></i> In</label>
+        <input type="text" id="node-input-inList">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-secret"><i class="fa fa-clock-o"></i> Out</label>
+        <input type="text" id="node-input-outList">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="TigerGraphVertex">
+    <p>Allows basic access to a TigerGraph database.</p>
+    
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('TigerGraphVertex',{
+        category: 'storage-input',
+        color:"#e97b00",
+        defaults: {
+            graph: {type:"TigerGraphDatabase",required:true},
+            name: {value:""},
+            vertex: {value:[],required:true},
+            inList: {value:[],required:true},
+            outList: {value:[],required:true},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "db.png",
+        label: function() {
+            var levelNode = RED.nodes.node(this.graph);
+            return this.name||(levelNode?levelNode.label():"TigerGraphVertex");
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>
+
+
+<!--  Node Query -->
+<script type="text/html" data-template-name="TigerGraphQuery">
+    <div class="form-row">
+        <label for="node-input-graph"><i class="fa fa-database"></i> TG Graph</label>
+        <input type="text" id="node-input-graph" placeholder="MyGraph">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    
+    <div class="form-row">
+        <label for="nodeinput-secret"><i class="fa fa-clock-o"></i> Query Name</label>
+        <input type="text" id="node-input-query">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-secret"><i class="fa fa-clock-o"></i> Parmeters</label>
+        <input type="text" id="node-input-params">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-secret"><i class="fa fa-clock-o"></i> Values</label>
+        <input type="text" id="node-input-vals">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="TigerGraphQuery">
+    <p>Allows basic access to a TigerGraph database.</p>
+    
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('TigerGraphQuery',{
+        category: 'storage-input',
+        color:"#e97b00",
+        defaults: {
+            graph: {type:"TigerGraphDatabase",required:true},
+            name: {value:""},
+            query: {value:"",required:true},
+            params: {value:"",required:false},
+            vals: {value:"",required:false},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "db.png",
+        label: function() {
+            var levelNode = RED.nodes.node(this.graph);
+            return this.name||(levelNode?levelNode.label():"TigerGraphQuery");
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>
+
+
+<!-- Node GSQL -->
+<!--  Node Query -->
+<script type="text/html" data-template-name="TigerGraphGSQL">
+    <div class="form-row">
+        <label for="node-input-graph"><i class="fa fa-database"></i> TG Graph</label>
+        <input type="text" id="node-input-graph" placeholder="MyGraph">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    
+    <div class="form-row">
+        <label for="nodeinput-secret"><i class="fa fa-clock-o"></i> GSQL </label>
+        <input type="text" id="node-input-gsql">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-secret"><i class="fa fa-clock-o"></i> gsPort</label>
+        <input type="text" id="node-input-gsPort" value="14240">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-secret"><i class="fa fa-clock-o"></i> enpoint</label>
+        <input type="text" id="node-input-endpoint" value="/gsql/gsqlserver">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="TigerGraphGSQL">
+    <p>Allows basic access to a TigerGraph database.</p>
+    
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('TigerGraphGSQL',{
+        category: 'storage-input',
+        color:"#e97b00",
+        defaults: {
+            graph: {type:"TigerGraphDatabase",required:true},
+            name: {value:""},
+            gsql: {value:"",required:true},
+            gsPort: {value:"14240",required:false},
+            endpoint: {value:"/gsqlserver/gsql",required:false},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "db.png",
+        label: function() {
+            var levelNode = RED.nodes.node(this.graph);
+            return this.name||(levelNode?levelNode.label():"TigerGraphGSQL");
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>

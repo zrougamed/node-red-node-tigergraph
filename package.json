@@ -1,0 +1,80 @@
+{
+  "_args": [
+    [
+      "node-red-node-tigergraph",
+      ""
+    ]
+  ],
+  "_from": "node-red-node-tigergraph",
+  "_hasShrinkwrap": false,
+  "_id": "node-red-node-tigergraph@0.1.3",
+  "_inBundle": false,
+  "_inCache": true,
+  "_installable": true,
+  "_integrity": "sha512-4N3gp6U7NcJ4x/I+fjWJcRXGdun1NrMUgUUZUlGIlIsEIGBswTWzl7djU6R7DQwvtMkgmJJHCKLTfwWlkQEvGw==",
+  "_location": "/node-red-node-tigergraph",
+  "_nodeVersion": "12.15.0",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/node-red-node-tigergraph_0.1.1_1587291373308_0.19450117097700637"
+  },
+  "_npmUser": {
+    "email": "ceejay@vnet.ibm.com",
+    "name": "dceejay"
+  },
+  "_npmVersion": "6.14.2",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "node-red-node-tigergraph",
+    "name": "node-red-node-tigergraph",
+    "escapedName": "node-red-node-tigergraph",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/node-red-node-tigergraph/-/node-red-node-tigergraph-0.1.2.tgz",
+  "_shasum": "55bfc2dec56caaa9047a9ce9565bcf81f8b6f237",
+  "_spec": "node-red-node-tigergraph",
+  "_where": "/home/med/test/node_modules/node-red-node-tigergraph",
+  "author": {
+    "name": "Zrouga Mohamed",
+    "email": "medzrouga@gmail.com",
+    "url": "https://zrouga.com"
+  },
+  "bugs": {
+    "url": "https://github.com/zrougamed/node-red-node-tigergraph/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {},
+  "deprecated": false,
+  "description": "A Node-RED node to read and write to a TigerGraph database",
+  "homepage": "https://github.com/zrougamed/node-red-node-tigergraph#readme",
+  "keywords": [
+    "TigerGraph",
+    "node-red"
+  ],
+  "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "name": "Zrouga Mohamed",
+      "email": "medzrouga@gmail.com"
+    }
+  ],
+  "name": "node-red-node-tigergraph",
+  "node-red": {
+    "nodes": {
+      "tigergraph": "99-tigergraph.js"
+    }
+  },
+  "optionalDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zrougamed/node-red-node-tigergraph.git"
+  },
+  "version": "0.1.3"
+}
