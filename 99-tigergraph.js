@@ -197,9 +197,13 @@ module.exports = function(RED) {
             });
             node.on("input", function(msg) {
                 if (node.graphConfig.connected) {
-                    try { 
-                            let resGsql = node.graphConfig.connection.runGSQL(this.gsql, this.gsPort, this.endpoint)
+                    try {
+                            var result = {};
+                            let resGsql = node.graphConfig.connection.runGSQL(this.gsql, this.gsPort, this.endpoint,result)
                             resGsql.then(function(result) {
+                                console.log("----------- HHHH ----------");
+                                console.log(result);
+                                console.log("----------- BBB ----------");
                                 let err = result["error"];
                                 if (err) {
                                     status = {fill:"red",shape:"ring",text:"Error: "+ result["message"]};

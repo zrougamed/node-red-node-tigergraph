@@ -553,76 +553,104 @@ class TigerGraphConnection {
 
 
    // done
-   async runGSQL(gsql = "", gsPort = "14240", endpoint="") {
+   runGSQL(Query = "", gsPort = "14240", endpoint="",context={}) {
+     let graph = this.GRAPH;
+     let user = this.USERNAME;
+     let pass = this.PASSWORD;
+     let host = this.HOST;
+     let useCerts = this.USECERT;
+     var quote = require('shell-quote').quote;
+     let gsql = Query;
+     // let gsql = Query.replace(/\r?\n/, ' ').trim();
+     // return Promise.all(
+     //
+     //     Query.split(/\r?\n/).map((gsql, i)=> {
     let p = new Promise((resolve, reject) => {
-    var cookie = {
-      'graph':this.GRAPH,
-      'clientCommit':'e9d3c5d98e7229118309f6d4bbc9446bad7c4c3d'
-      }
-    const auth = Buffer.from(`${this.USERNAME}:${this.PASSWORD}`).toString('base64')
-    // const data = gsql
-    const options = {
-      hostname: `${this.HOST}`,
-      port: gsPort,
-      path: `${endpoint}/command`,
-      method: 'POST',
-      headers: {
-        'Cookie': JSON.stringify(cookie),
-        'Content-Length': gsql.length,
-        'Authorization' : `Basic ${auth}`,
-        "Pragma": "no-cache",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "Java/1.8.0"
-      }
-    };
-    if (this.USECERT == 'true') {
-      const req = https.request(options, res => {
-        res.setEncoding('utf8');
-        let data = '';
-        console.log(`statusCode: ${res.statusCode}`)
-        res.on('data', chunk => {
-          data += chunk;
-        });
-        res.on('end', async () => {
-            return resolve(data.split("__GSQL__COOKIES__")[0]);
-        });
-        res.on('error', (err) => {
-          reject(err);
-        })
-      });
-      req.on('error', error => {
-        reject(error);
-      });
-      req.write(gsql);
-      req.end();
-    }
-    else
-    {
-      const req = http.request(options, res => {
-        res.setEncoding('utf8');
-        let data = '';
-        console.log(`statusCode: ${res.statusCode}`)
-        res.on('data', chunk => {
-          data += chunk;
-        });
-        res.on('end', async () => {
-            return resolve(data.split("__GSQL__COOKIES__")[0]);
-        });
-        res.on('error', (err) => {
-          reject(err);
-        })
-      });
-      req.on('error', error => {
-        reject(error);
-      });
-      req.write(gsql);
-      req.end();
-    }
+      // return new Promise(function(resolve, reject){
+        var cookie = {
+          'graph':graph,
+          'clientCommit':'e9d3c5d98e7229118309f6d4bbc9446bad7c4c3d'
+          }
+        const auth = Buffer.from(`${user}:${pass}`).toString('base64')
+        console.log("---------------- BEGIN--------------------------");
+        console.log(gsql);
+        console.log("---------------- END --------------------------");
+        const options = {
+          hostname: `${host}`,
+          port: gsPort,
+          path: `${endpoint}/file`, // command
+          method: 'POST',
+          headers: {
+            'Cookie': JSON.stringify(cookie),
+            'Content-Length': gsql.length,
+            'Authorization' : `Basic ${auth}`,
+            "Pragma": "no-cache",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": "Java/1.8.0"
+          }
+        };
+        if (useCerts == 'true') {
+          const req = https.request(options, res => {
+            res.setEncoding('utf8');
+            let data = '';
+            console.log(`statusCode: ${res.statusCode}`)
+            res.on('data', chunk => {
+              data += chunk;
+            });
+            res.on('end', async () => {
+              console.log(data)
+                // context[i+1] = data.split("__GSQL__COOKIES__")[0];
+                console.log(data);
+                //resolve(data.split("__GSQL__COOKIES__")[0]);
+                return resolve(data.split("__GSQL__COOKIES__")[0]);
+            });
+            res.on('error', (err) => {
+              reject(err);
+            })
+          });
+          req.on('error', error => {
+            reject(error);
+          });
 
-  });
-  return await p;
+            req.write(gsql);
+
+          req.end();
+        }
+        else
+        {
+          const req = http.request(options, res => {
+            res.setEncoding('utf8');
+            let data = '';
+            console.log(`statusCode: ${res.statusCode}`)
+            res.on('data', chunk => {
+              data += chunk;
+            });
+            res.on('end', async () => {
+                // return resolve(data.split("__GSQL__COOKIES__")[0]);
+              // context[i+1] = data.split("__GSQL__COOKIES__")[0];
+              resolve(data.split("__GSQL__COOKIES__")[0]);
+            });
+            res.on('error', (err) => {
+              reject(err);
+            })
+          });
+          req.on('error', error => {
+            reject(error);
+          });
+          
+          
+          req.write(gsql);  
+         
+          
+          req.end();
+        }
+
+      });
+  return  p;
+  //        })
+  //    );
   }
 
 }

@@ -50,7 +50,9 @@
     "url": "https://github.com/zrougamed/node-red-node-tigergraph/issues"
   },
   "bundleDependencies": false,
-  "dependencies": {},
+  "dependencies": {
+    "shell-quote": "^1.7.2"
+  },
   "deprecated": false,
   "description": "A Node-RED node to read and write to a TigerGraph database",
   "homepage": "https://github.com/zrougamed/node-red-node-tigergraph#readme",

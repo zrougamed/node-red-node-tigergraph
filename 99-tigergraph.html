@@ -289,7 +289,10 @@
     
     <div class="form-row">
         <label for="nodeinput-secret"><i class="fa fa-clock-o"></i> GSQL </label>
-        <input type="text" id="node-input-gsql">
+
+        <div  style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-gsql-editor"></div>
+        <input type="hidden" id="node-input-gsql" autofocus="autofocus">
+
     </div>
 
     <div class="form-row">
@@ -309,6 +312,7 @@
 </script>
 
 <script type="text/javascript">
+
     RED.nodes.registerType('TigerGraphGSQL',{
         category: 'storage-input',
         color:"#e97b00",
@@ -328,6 +332,148 @@
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";
-        }
+        },
+        oneditprepare: function() {
+            var that = this;
+
+            this.editor = RED.editor.createEditor({
+                id: 'node-input-gsql-editor',
+                mode: 'ace/mode/text', // sql
+                value: $("#node-input-gsql"). val(),
+            });
+        
+            ///// GSQL Linting Syntax Highliter and completer
+            var keywords = ['ADD UNDIRECTED','ADD','CREATE QUERY','CREATE OR REPLACE QUERY','CREATE SCHEMA_CHANGE JOB','CREATE BATCH QUERY','CREATE DISTRIBUTED QUERY','INSTALL QUERY','RUN QUERY','SHOW QUERY','DROP QUERY','DROP JOB','FOR GRAPH','PRINT','LOG','RETURN','RETURNS','RAISE','TRY','EXCEPTION','SELECT','FROM','WHERE','SAMPLE','WHEN','ACCUM','POST-ACCUM','HAVING','ORDER BY','ASC','DESC','LIMIT','OFFSET','DELETE','INSERT','VALUES','UPDATE','IF','THEN','ELSE','ELSE IF','WHILE','DO','FOREACH','END','IN RANGE','CASE','CONTINUE','BREAK','TYPEDEF TUPLE','STATIC','ANY','API','AS','BATCH','BOTH','BY','CATCH','DISTINCT','FILTER','GROUP BY','INTERPRET','INTERVAL','INTO','ISEMPTY','LASTHOP','LEADING','LOADACCUM','PER','PINNED','POST_ACCUM','RANGE','TARGET','TO_CSV','TRAILING','TYPEDEF'];
+            var dataTypes = ['INT','UINT','FLOAT','DOUBLE','STRING','STRING COMPRESS','DATETIME','BOOL','VERTEX','EDGE','JSONOBJECT','JSONARRAY','SET','BAG','FILE','AvgAccum','SumAccum','MaxAccum','MinAccum','OrAccum','AndAccum','BitwiseOrAccum','BitwiseAndAccum','ListAccum','SetAccum','BagAccum','MapAccum','ArrayAccum','HeapAccum','GroupByAccum'];
+            var builtinConstants = ['PRIMARY_ID_AS_ATTRIBUTE','STATS','TRUE','FALSE','NULL','GSQL_UINT_MAX','GSQL_INT_MAX','GSQL_INT_MIN'];
+            var operators = ['WITH','NOT','AND','OR','BETWEEN','IS NULL','IS NOT NULL','LIKE','NOT LIKE','ESCAPE','UNION','INTERSECT','MINUS','IN','NOT IN'];
+            var builtinFunctions = ['abs','sqrt','pow','acos','asin','atan','atan2','ceil','cos','cosh','exp','floor','fmod','ldexp','log','log10','sin','sinh','tan','tanh','to_string','float_to_int','str_to_int','lower','upper','trim','to_datetime','epoch_to_datetime','datetime_to_epoch','datetime_format','now','year','month','day','hour','minute','second','datetime_add','datetime_sub','datetime_diff','parse_json_object','parse_json_array','containsKey','getInt','getDouble','getString','getBool','getJsonObject','getJsonArray','size','clear','outdegree','neighbors','neighborAttribute','edgeAttribute','getAttr','setAttr','isDirected','count','sum','min','max','avg','selectVertex','to_vertex_set','to_vertex','coalesce','getvid','evaluate'];
+
+            var dictionary = [].concat(keywords, builtinConstants, dataTypes, operators, builtinFunctions);
+            var staticWordCompleter = {
+            getCompletions: function(editor, session, pos, prefix, callback) {
+                    
+                    callback(null, [...keywords.map(function(word) {
+                        return {
+                            caption: word,
+                            value: word,
+                            meta: "static"
+                        };
+                    }), ...session.$mode.$highlightRules.$keywordList.map(function(word) {
+                    return {
+                    caption: word,
+                    value: word,
+                    meta: 'keyword',
+                    };
+                })]);
+
+                }
+            }
+
+            this.editor.completers = [staticWordCompleter]  
+           
+            // this.editor.session.$mode.$highlightRules.$keywordList = keywords;
+            console.log("=============================");
+            var keywordMapper = this.editor.session.$mode.$highlightRules.createKeywordMapper({
+                "support.function": builtinFunctions.join("|"),
+                "keyword": keywords.join("|"),
+                "constant.language": builtinConstants.join("|"),
+                "storage.type": dataTypes.join("|")
+            }, "identifier", true);
+
+
+            var mode = this.editor.session.$mode;
+            mode.$highlightRules.addRules({
+                "start" : [ 
+                
+                    {
+                        token : "comment",
+                        regex : "--.*$"
+                    },  {
+                        token : "comment",
+                        start : "/\\*",
+                        end : "\\*/"
+                    }, {
+                        token : "string",           // " string
+                        regex : '".*?"'
+                    }, {
+                        token : "string",           // ' string
+                        regex : "'.*?'"
+                    }, {
+                        token : "string",           // ` string (apache drill)
+                        regex : "`.*?`"
+                    }, {
+                        token : "constant.numeric", // float
+                        regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
+                    }, 
+                    {
+                        token : "support.function",
+                        regex :   new RegExp(builtinFunctions.join("|"), 'g')
+                        // regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b" // "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+                    },
+                    {
+                        token : "storage.type",
+                        regex :   new RegExp(dataTypes.join("|"), 'g')
+                        // regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b" // "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+                    },
+                    {
+                        token : "constant.language",
+                        regex : new RegExp(builtinConstants.join("|"),'g')
+                    },
+                    {
+                        token : "keyword",
+                        regex :   new RegExp(keywords.join("|"), 'g')
+                        // regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b" // "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+                    },
+                    // {
+                    //     token : keywordMapper,
+                    //     regex :   new RegExp(dictionary.join("|"), 'g')
+                    //     // regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b" // "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+                    // }, 
+                    {
+                        token : "keyword.operator",
+                        regex : "\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|="
+                    }, {
+                        token : "paren.lparen",
+                        regex : "[\\(]"
+                    }, {
+                        token : "paren.rparen",
+                        regex : "[\\)]"
+                    }, {
+                        token : "text",
+                        regex : "\\s+"
+                    } ]
+            });
+            
+      
+           
+            console.log(this.editor.session.$mode.$highlightRules);
+          
+
+
+
+            // // update keywords
+            // this.editor.session.$mode.$highlightRules.setKeywords({"keyword": keywords.join("|")})
+            // // force rehighlight whole document
+            
+
+            this.editor.session.$mode.$tokenizer = null;
+            this.editor.session.bgTokenizer.setTokenizer(this.editor.session.$mode.getTokenizer());
+            this.editor.session.bgTokenizer.start(0)
+            
+            console.log(this.editor.session.$mode.$highlightRules.$keywordList);
+            console.log("=============================");
+ 
+  
+        },
+        oneditsave: function() {
+            $("#node-input-gsql").val(this.editor.getValue());
+            this.editor.destroy();
+            delete this.editor;
+        },
+        oneditcancel : function() {
+            this.editor.destroy();
+            delete this. editor;
+        },
     });
 </script>
