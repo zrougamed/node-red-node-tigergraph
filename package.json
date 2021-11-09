@@ -78,5 +78,5 @@
     "type": "git",
     "url": "git+https://github.com/zrougamed/node-red-node-tigergraph.git"
   },
-  "version": "0.1.3"
+  "version": "0.1.4"
 }

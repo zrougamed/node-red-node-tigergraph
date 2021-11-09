@@ -282,7 +282,7 @@ module.exports = function(RED) {
                             var inputList = JSON.parse(this.inList); // graphConfig.
                             var OutputList = JSON.parse(this.outList); // graphConfig.
                             inputList.forEach(element => { 
-                                objs[element] = {"value":escape(String(msg[OutputList[inputList.indexOf(element)]]))};
+                                objs[element] = {"value":String(msg[OutputList[inputList.indexOf(element)]])};
                               }); 
 
                             let res1 = node.graphConfig.connection.upsertVertex(this.vertex,String(msg[inputList[0]]), objs)
@@ -371,7 +371,7 @@ module.exports = function(RED) {
                             var OutputList = JSON.parse(this.outList); // graphConfig.
 
                             inputList.forEach(element => { 
-                                objs[element] = {"value":escape(String(msg[OutputList[inputList.indexOf(element)]]))};
+                                objs[element] = {"value":String(msg[OutputList[inputList.indexOf(element)]])};
                               }); 
 
 
